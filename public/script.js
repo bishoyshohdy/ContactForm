@@ -22,50 +22,39 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-try {
-  const docRef = await addDoc(collection(db, "messages"), {
-    test: "This is a test message",
-    timestamp: new Date()
-  });
-  console.log("Document written with ID: ", docRef.id);
-} catch (error) {
-  console.error("Error adding document: ", error);
-}
+// Reference the form
+const contactForm = document.getElementById("contactForm");
 
+// Listen for form submissions
+contactForm.addEventListener("submit", async (e) => {
+  e.preventDefault(); // Prevent form from refreshing the page
 
-// // Reference the form
-// const contactForm = document.getElementById("contactForm");
+  // Collect form data
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const message = document.getElementById("message").value;
 
-// // Listen for form submissions
-// contactForm.addEventListener("submit", async (e) => {
-//   e.preventDefault(); // Prevent form from refreshing the page
+  // Validate data (optional)
+  if (!name || !email || !message) {
+    alert("All fields are required!");
+    return;
+  }
 
-//   // Collect form data
-//   const name = document.getElementById("name").value;
-//   const email = document.getElementById("email").value;
-//   const message = document.getElementById("message").value;
+  // Save data to Firestore
+  try {
+    const docRef = await addDoc(collection(db, "messages"), {
+      name: name,
+      email: email,
+      message: message,
+      timestamp: new Date(),
+    });
 
-//   // Validate data (optional)
-//   if (!name || !email || !message) {
-//     alert("All fields are required!");
-//     return;
-//   }
-
-//   // Save data to Firestore
-//   try {
-//     const docRef = await addDoc(collection(db, "messages"), {
-//       name: name,
-//       email: email,
-//       message: message,
-//       timestamp: new Date(),
-//     });
-
-//     console.log("Document written with ID: ", docRef.id);
-//     document.getElementById("status").innerText = "Message sent successfully!";
-//     contactForm.reset();
-//   } catch (error) {
-//     console.error("Error adding document: ", error);
-//     document.getElementById("status").innerText =
-//       "Failed to send message. Try again.";
-//   }
-// });
+    console.log("Document written with ID: ", docRef.id);
+    document.getElementById("status").innerText = "Message sent successfully!";
+    contactForm.reset();
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    document.getElementById("status").innerText =
+      "Failed to send message. Try again.";
+  }
+});
